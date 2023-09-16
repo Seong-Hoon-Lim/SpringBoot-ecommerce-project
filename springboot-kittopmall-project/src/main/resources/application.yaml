@@ -1,0 +1,19 @@
+debug: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    com.com.kittopmall: debug
+    org.springframework.web.servlet: debug
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/kittopmall
+    username: hooney
+    password: hooney1108!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
