@@ -14,14 +14,9 @@ import java.time.LocalDateTime;
 public class CommentVo {
 
     private Long id;
-    private UserVo user;
-    private ItemVo item;
-    private OrderVo order;
-
-    private String title;
     private String content;
-
     private LocalDateTime createdAt;
+    private QuestionVo question;
 
 
 

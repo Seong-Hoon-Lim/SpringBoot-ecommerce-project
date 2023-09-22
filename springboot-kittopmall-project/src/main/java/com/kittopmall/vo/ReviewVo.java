@@ -14,16 +14,16 @@ import java.time.LocalDateTime;
 public class ReviewVo {
 
     private Long id;
-    private UserVo user;
-    private ItemVo item;
-    private OrderVo order;
-
     private String title;
     private String content;
+    private UserVo user;
 
     private LocalDateTime createdAt;
     private String createdBy;
     private LocalDateTime updateDate;
     private String updatedBy;
+
+    private ItemVo item;
+    private OrderVo order;
 
 }

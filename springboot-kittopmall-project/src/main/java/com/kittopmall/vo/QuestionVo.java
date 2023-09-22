@@ -15,16 +15,16 @@ import java.time.LocalDateTime;
 public class QuestionVo {
 
     private Long id;
-    private UserVo user;
-    private OrderVo order;
-
+    private Category category;
     private String title;
     private String content;
-    private Category category;
+    private UserVo user;
+
 
     private LocalDateTime createdAt;
     private String createdBy;
     private LocalDateTime updateDate;
     private String updatedBy;
+    private OrderVo order;
 
 }
