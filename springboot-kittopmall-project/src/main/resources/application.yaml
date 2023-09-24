@@ -9,6 +9,7 @@ logging:
   level:
     com.com.kittopmall: debug
     org.springframework.web.servlet: debug
+    org.mybatis: trace
 
 spring:
   datasource:
