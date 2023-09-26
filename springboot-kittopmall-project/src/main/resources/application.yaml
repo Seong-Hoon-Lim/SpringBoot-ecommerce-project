@@ -7,9 +7,9 @@ management:
 
 logging:
   level:
-    com.com.kittopmall: debug
+    com.kittopmall: debug
     org.springframework.web.servlet: debug
-    org.mybatis: trace
+    org.apache.ibatis: trace
 
 spring:
   datasource:
@@ -21,4 +21,8 @@ spring:
     hikari:
       maximum-pool-size: 10
       minimum-idle: 5
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
 

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+        <!DOCTYPE mapper
+                PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kittopmall.mapper.UserMapper">
+
+    <resultMap id="userResultMap" type="com.kittopmall.vo.UserVo">
+        <id property="id" column="userId"/>
+    </resultMap>
+
+    <insert id="save">
+        insert into kittopmall.user (`email`, `password`, `nickname`, `name`, `birth`, `gender`, `addr`, `phone`, `provider`, `providerId`, `createdBy`, `role`)
+        values (#{email}, #{password}, #{nickname}, #{name}, #{birth}, #{gender}, #{addr}, #{phone}, #{provider}, #{providerId}, #{createdBy}, #{role})
+    </insert>
+
+    <select id="count" resultType="long">
+        select count(*) from kittopmall.user
+    </select>
+
+    <select id="findUserByUserId" resultMap="userResultMap">
+        select * from kittopmall.user where `userId` = #{id}
+    </select>
+
+    <select id="findUserByEmail" resultType="com.kittopmall.vo.UserVo">
+        select * from kittopmall.user where `email` = #{email}
+    </select>
+
+    <select id="findUserByNickname" resultType="com.kittopmall.vo.UserVo">
+        select * from kittopmall.user where `nickName` = #{nickName}
+    </select>
+
+    <update id="update">
+        update kittopmall.user set `password` = #{password}, `nickname` = #{nickname}, `name` = #{name}, `birth` = #{birth}, `gender` = #{gender}, `addr` = #{addr}, `phone` = #{phone}, `updateDate` = now(), `updatedBy` = #{updatedBy}, `role` = #{role}
+        where userId = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from kittopmall.user where userId = #{userId}
+    </delete>
+
+<!--    <select id="findUserList" resultType="com.kittopmall.vo.UserVo">-->
+<!--        select * from kittopmall.user-->
+<!--        <include refid="search"/>-->
+<!--        order by userId desc limit #{start}, #{size}-->
+<!--    </select>-->
+
+<!--    <select id="findUserCount" resultType="int">-->
+<!--        select count(*) from kittopmall.user-->
+<!--        <include refid="search"/>-->
+<!--    </select>-->
+<!--    -->
+<!--    <sql id="search">-->
+<!--        <where>-->
+<!--            <if test="types != null and types.length > 0">-->
+<!--                <foreach collection="types" item="type" open="(" close=")" separator=" OR">-->
+<!--                    <if test="type == 'e'.toString()">-->
+<!--                        email like concat('%', #{keyword}, '%')-->
+<!--                    </if>-->
+<!--                    <if test="type == 'i'.toString()">-->
+<!--                        nickName like concat('%', #{keyword}, '%')-->
+<!--                    </if>-->
+<!--                    <if test="type == 'n'.toString()">-->
+<!--                        `name` like concat('%', #{keyword}, '%')-->
+<!--                    </if>-->
+<!--                    <if test="type == 'in'.toString()">-->
+<!--                        nickName like concat('%', #{keyword}, '%')-->
+<!--                        or-->
+<!--                        `name` like concat('%', #{keyword}, '%')-->
+<!--                    </if>-->
+<!--                    <if test="type == 'ein'.toString()">-->
+<!--                        email like concat('%', #{keyword}, '%')-->
+<!--                        or-->
+<!--                        nickName like concat('%', #{keyword}, '%')-->
+<!--                        or-->
+<!--                        `name` like concat('%', #{keyword}, '%')-->
+<!--                    </if>-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--        </where>-->
+<!--    </sql>-->
+
+</mapper>

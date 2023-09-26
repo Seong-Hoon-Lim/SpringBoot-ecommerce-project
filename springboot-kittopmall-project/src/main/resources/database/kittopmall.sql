@@ -12,16 +12,16 @@ CREATE TABLE kittopmall.user
     `gender`     VARCHAR(10)  NOT NULL,
     `addr`       VARCHAR(100) NOT NULL,
     `phone`      VARCHAR(100) NOT NULL,
-    `provider`   VARCHAR(100),
-    `providerId` VARCHAR(100),
+    `provider`   VARCHAR(100) NULL,
+    `providerId` VARCHAR(100) NULL,
     `createdAt`  DATETIME     NOT NULL DEFAULT now(),
     `createdBy`  VARCHAR(100) NOT NULL,
     `updateDate` DATETIME     NULL     DEFAULT NULL,
-    `updatedBy`  VARCHAR(100) NOT NULL,
+    `updatedBy`  VARCHAR(100) NULL,
     `role`       VARCHAR(50)  NOT NULL,
     PRIMARY KEY (`userId`),
     UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
-    UNIQUE INDEX `nickName_UNIQUE` (`nickName` ASC) VISIBLE,
+    UNIQUE INDEX `nickname_UNIQUE` (`nickname` ASC) VISIBLE,
     UNIQUE INDEX `phone_UNIQUE` (`phone` ASC) VISIBLE
 );
 
@@ -63,9 +63,10 @@ CREATE TABLE kittopmall.cart
             ON UPDATE NO ACTION,
     CONSTRAINT `cart_itemId_FK`
         FOREIGN KEY (`itemId`)
-            REFERENCES `item` (`itemId`),
-    UNIQUE INDEX `itemId_UNIQUE` (`itemId` ASC) VISIBLE ON DELETE CASCADE
-            ON UPDATE CASCADE
+            REFERENCES `item` (`itemId`)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
+    UNIQUE INDEX `itemId_UNIQUE` (`itemId` ASC) VISIBLE
 );
 
 DROP TABLE kittopmall.orders;
@@ -92,7 +93,7 @@ CREATE TABLE kittopmall.orders
     `tossMethod`      VARCHAR(10)  NOT NULL,
     `tossBank`        VARCHAR(10)  NOT NULL,
     `reviewId`        BIGINT       NULL,
-    `questionId`         BIGINT       NULL,
+    `questionId`      BIGINT       NULL,
     PRIMARY KEY (`orderId`)
 );
 
@@ -101,7 +102,7 @@ SELECT *
 FROM kittopmall.question;
 CREATE TABLE kittopmall.question
 (
-    `questionId`    BIGINT       NOT NULL AUTO_INCREMENT,
+    `questionId` BIGINT       NOT NULL AUTO_INCREMENT,
     `category`   VARCHAR(10)  NOT NULL,
     `title`      VARCHAR(50)  NOT NULL,
     `content`    VARCHAR(500) NOT NULL,
@@ -144,10 +145,10 @@ SELECT *
 FROM kittopmall.comment;
 CREATE TABLE kittopmall.comment
 (
-    commentId BIGINT       NOT NULL AUTO_INCREMENT,
-    `content`  VARCHAR(500) NOT NULL,
+    commentId    BIGINT       NOT NULL AUTO_INCREMENT,
+    `content`    VARCHAR(500) NOT NULL,
     `createdAt`  DATETIME     NOT NULL DEFAULT now(),
-    `questionId`  BIGINT       NOT NULL,
+    `questionId` BIGINT       NOT NULL,
     PRIMARY KEY (commentId),
     INDEX `comment_questionId_FK_idx` (`questionId` ASC) VISIBLE,
     CONSTRAINT `comment_questionId_FK`
