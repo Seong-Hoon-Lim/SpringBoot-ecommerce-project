@@ -9,6 +9,10 @@
     </Appenders>
 
     <loggers>
+        <logger name="org.apache.ibatis" level="TRACE" additivity="false">
+            <appender-ref ref="console"/>
+        </logger>
+
         <logger name="org.springframework" level="INFO" additivity="false">
             <appender-ref ref="console"/>
         </logger>
