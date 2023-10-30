@@ -19,6 +19,7 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/", "/kittop", "/kittop/signup", "/kittop/signin"
                         ).permitAll()
+                        .mvcMatchers(HttpMethod.POST, "/kittop/signup").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
