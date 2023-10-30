@@ -1,9 +1,10 @@
 package com.kittopmall.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kittopmall.config.SecurityConfig;
 import com.kittopmall.dto.UserDto;
 import com.kittopmall.mapper.UserMapper;
-import com.kittopmall.service.UserServiceImpl;
+import com.kittopmall.service.UserService;
 import com.kittopmall.vo.UserVo;
 import com.kittopmall.vo.constants.Role;
 import lombok.extern.log4j.Log4j2;
@@ -18,10 +19,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.assertj.core.api.Assertions.*;
-
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("회원관리 controller 테스트")
@@ -31,11 +32,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerTest {
 
     private final MockMvc mvc;
-    @MockBean private UserServiceImpl userService;
+
+    @MockBean private UserService userService;
     @MockBean private UserMapper userMapper;
     @MockBean private ModelMapper mapper;
 
-    public UserControllerTest(@Autowired MockMvc mvc) {
+    public UserControllerTest(
+            @Autowired MockMvc mvc
+    ) {
         this.mvc = mvc;
     }
 
@@ -98,6 +102,71 @@ class UserControllerTest {
         then(userService).should().getUserByUserId(userId);
     }
 
+    @DisplayName("[API][POST] 회원 등록 - 정상 호출")
+    @Test
+    void givenUserForm_whenRequesting_thenSavesUserForm() throws Exception {
+        //Given
+        UserDto dto = createUserDto();
+        String obj = new ObjectMapper().writeValueAsString(dto);
+        willDoNothing().given(userService).registerUser(any(UserDto.class));
+
+        //When & Then
+        mvc.perform(
+                        post("/kittop/signup")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(obj)
+                                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("정상적으로 회원 등록 되었습니다.")));
+
+        then(userService).should().registerUser(any(UserDto.class));
+    }
+
+    @DisplayName("[API][PUT] 회원 수정 - 정상 호출, 인증된 사용자")
+    @WithMockUser
+    @Test
+    void givenUpdatedUserForm_whenRequesting_thenUpdatesUserForm() throws Exception {
+        //Given
+        long userId = 1L;
+        UserDto createdDto = createUserDto();
+        UserDto updatedDto = updatedUserDto();
+        userService.registerUser(createdDto);
+        String updatedObj = new ObjectMapper().writeValueAsString(updatedDto);
+
+        willDoNothing().given(userService).registerUser(any(UserDto.class));
+
+        //When & Then
+        mvc.perform(
+                put("/kittop/user" + userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updatedObj)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("정상적으로 회원 수정 되었습니다.")));
+        then(userService).should().modifyUser(any(UserDto.class));
+    }
+
+    @DisplayName("[API][DELETE] 회원 삭제 - 정상 호출, 인증된 사용자")
+    @WithMockUser
+    @Test
+    void givenUser_whenRequesting_thenDeletesUser() throws Exception {
+        //Given
+        long userId = 1L;
+        UserDto dto = createUserDto();
+        userService.registerUser(createUserDto());
+        String obj = new ObjectMapper().writeValueAsString(dto);
+        willDoNothing().given(userService).removeUser(userId);
+
+        //When & Then
+        mvc.perform(
+                        delete("/kittop/user" + userId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(obj)
+                                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("정상적으로 회원 삭제 되었습니다.")));
+        then(userService).should().removeUser(userId);
+    }
 
     private UserVo updatedUser() {
         return UserVo.builder()
