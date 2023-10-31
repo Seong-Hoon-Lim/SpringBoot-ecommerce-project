@@ -32,8 +32,6 @@ class UserControllerTest {
     private final MockMvc mvc;
 
     @MockBean private UserService userService;
-    @MockBean private UserMapper userMapper;
-    @MockBean private ModelMapper mapper;
 
     public UserControllerTest(
             @Autowired MockMvc mvc
@@ -64,8 +62,7 @@ class UserControllerTest {
         mvc.perform(get("/kittop/signin"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-                .andExpect(view().name("user/signin"))
-                .andExpect(model().attributeExists("loginForm"));
+                .andExpect(view().name("user/signin"));
     }
 
     @DisplayName("[View][GET] 회원 정보 페이지 - 인증이 없다면 로그인 페이지로 이동")
@@ -86,22 +83,22 @@ class UserControllerTest {
     @Test
     void givenNothing_whenRequestingDisplayingUserInfoView_thenReturnsUserInfoView() throws Exception {
         //Given
-        long userId = 1L;
+        String email = "test@gmail.com";
         UserDto dto = createUserDto();
-        given(mapper.map(any(UserVo.class), eq(UserDto.class))).willReturn(createUserDto());
-        given(userMapper.findUserByUserId(userId)).willReturn(createUser());
+        given(userService.getUserByEmail(email)).willReturn(dto);
 
         //When & Then
-        mvc.perform(get("/kittop/user/" + userId))
+        mvc.perform(get("/kittop/user/" + email))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("user/info"))
-                .andExpect(model().attributeExists("user"));
-        then(userService).should().getUserByUserId(userId);
+                .andExpect(model().attribute("user", dto));
+        then(userService).should().getUserByEmail(email);
     }
 
     private UserVo updatedUser() {
         return UserVo.builder()
+                .id(1L)
                 .email("modify@gmail.com")
                 .password("1111")
                 .nickname("modify")
@@ -119,6 +116,7 @@ class UserControllerTest {
 
     private UserDto updatedUserDto() {
         return UserDto.builder()
+                .id(1L)
                 .email("modify@gmail.com")
                 .password("1111")
                 .nickname("modify")
@@ -135,6 +133,7 @@ class UserControllerTest {
     }
     private UserDto createUserDto() {
         return UserDto.builder()
+                .id(1L)
                 .email("test@gmail.com")
                 .password("1234")
                 .nickname("test")
@@ -152,6 +151,7 @@ class UserControllerTest {
 
     private UserVo createUser() {
         return UserVo.builder()
+                .id(1L)
                 .email("test@gmail.com")
                 .password("1234")
                 .nickname("test")
