@@ -1,7 +1,7 @@
-package com.kittopmall.controller;
+package com.kittopmall.controller.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kittopmall.config.SecurityConfig;
-import com.kittopmall.controller.view.UserController;
 import com.kittopmall.dto.UserDto;
 import com.kittopmall.mapper.UserMapper;
 import com.kittopmall.service.UserService;
@@ -19,15 +19,18 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@DisplayName("회원관리 View Controller 테스트")
+@DisplayName("회원 관리 API Controller 테스트")
 @Log4j2
 @Import(SecurityConfig.class)
-@WebMvcTest(UserController.class)
-class UserControllerTest {
+@WebMvcTest(UserRestController.class)
+class UserRestControllerTest {
 
     private final MockMvc mvc;
 
@@ -35,69 +38,74 @@ class UserControllerTest {
     @MockBean private UserMapper userMapper;
     @MockBean private ModelMapper mapper;
 
-    public UserControllerTest(
-            @Autowired MockMvc mvc
-    ) {
+    public UserRestControllerTest(@Autowired MockMvc mvc) {
         this.mvc = mvc;
     }
 
-    @DisplayName("[View][GET] 회원가입 페이지 - 정상 호출")
+    @DisplayName("[API][POST] 회원 등록 - 정상 호출")
     @Test
-    void givenNothing_whenRequestingDisplayingSignupView_thenReturnSignupView() throws Exception {
+    void givenUserForm_whenRequesting_thenSavesUserForm() throws Exception {
         //Given
+        UserDto dto = createUserDto();
+        String obj = new ObjectMapper().writeValueAsString(dto);
+        willDoNothing().given(userService).registerUser(any(UserDto.class));
 
         //When & Then
-        mvc.perform(get("/kittop/signup"))
+        mvc.perform(
+                        post("/kittop/signup")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(obj)
+                                .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-                .andExpect(view().name("user/signup"))
-                .andExpect(model().attributeExists("user"));
+                .andExpect(content().string(containsString("정상적으로 회원 등록 되었습니다.")));
+
+        then(userService).should().registerUser(any(UserDto.class));
     }
 
-    @DisplayName("[View][GET] 회원 로그인 페이지 - 정상 호출")
+    @DisplayName("[API][PUT] 회원 수정 - 정상 호출, 인증된 사용자")
     @WithMockUser
     @Test
-    void givenNothing_whenRequestingDisplayingSigninView_thenReturnsSigninView() throws Exception {
-        //Given
-
-        //When & Then
-        mvc.perform(get("/kittop/signin"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-                .andExpect(view().name("user/signin"))
-                .andExpect(model().attributeExists("loginForm"));
-    }
-
-    @DisplayName("[View][GET] 회원 정보 페이지 - 인증이 없다면 로그인 페이지로 이동")
-    @Test
-    void givenNothing_whenRequestingDisplayingUserInfoView_thenRedirectsToSigninView() throws Exception {
+    void givenUpdatedUserForm_whenRequesting_thenUpdatesUserForm() throws Exception {
         //Given
         long userId = 1L;
+        UserDto createdDto = createUserDto();
+        UserDto updatedDto = updatedUserDto();
+        userService.registerUser(createdDto);
+        String updatedObj = new ObjectMapper().writeValueAsString(updatedDto);
+
+        willDoNothing().given(userService).registerUser(any(UserDto.class));
 
         //When & Then
-        mvc.perform(get("/kittop/user/" + userId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern("**/signin"));
-        then(userService).shouldHaveNoInteractions();
+        mvc.perform(
+                        put("/kittop/user" + userId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(updatedObj)
+                                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("정상적으로 회원 수정 되었습니다.")));
+        then(userService).should().modifyUser(any(UserDto.class));
     }
 
-    @DisplayName("[View][GET] 회원 정보 페이지 / 회원 수정 페이지 - 정상 호출, 인증된 사용자")
+    @DisplayName("[API][DELETE] 회원 삭제 - 정상 호출, 인증된 사용자")
     @WithMockUser
     @Test
-    void givenNothing_whenRequestingDisplayingUserInfoView_thenReturnsUserInfoView() throws Exception {
+    void givenUser_whenRequesting_thenDeletesUser() throws Exception {
         //Given
         long userId = 1L;
         UserDto dto = createUserDto();
-        given(mapper.map(any(UserVo.class), eq(UserDto.class))).willReturn(createUserDto());
-        given(userMapper.findUserByUserId(userId)).willReturn(createUser());
+        userService.registerUser(createUserDto());
+        String obj = new ObjectMapper().writeValueAsString(dto);
+        willDoNothing().given(userService).removeUser(userId);
 
         //When & Then
-        mvc.perform(get("/kittop/user/" + userId))
+        mvc.perform(
+                        delete("/kittop/user" + userId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(obj)
+                                .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-                .andExpect(view().name("user/info"))
-                .andExpect(model().attributeExists("user"));
-        then(userService).should().getUserByUserId(userId);
+                .andExpect(content().string(containsString("정상적으로 회원 삭제 되었습니다.")));
+        then(userService).should().removeUser(userId);
     }
 
     private UserVo updatedUser() {
