@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public void modifyUser(UserDto userDto) {
         UserVo user = mapper.map(userDto, UserVo.class);
-        UserVo registeredUser = userMapper.findUserByUserId(user.getId());
+        UserVo registeredUser = userMapper.findUserByEmail(user.getEmail());
         if (userDto.getPassword().equals(registeredUser.getPassword())) {
             throw new PasswordNotChangedException();
         }
