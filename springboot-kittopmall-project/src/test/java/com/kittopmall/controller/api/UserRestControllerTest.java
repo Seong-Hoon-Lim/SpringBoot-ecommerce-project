@@ -11,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -67,24 +68,34 @@ class UserRestControllerTest {
     @Test
     void givenUpdatedUserForm_whenRequesting_thenUpdatesUserForm() throws Exception {
         //Given
-        long userId = 1L;
+        String email = "test@gmail.com";
         UserDto createdDto = createUserDto();
         UserDto updatedDto = updatedUserDto();
-        userService.registerUser(createdDto);
-        String updatedObj = new ObjectMapper().writeValueAsString(updatedDto);
 
-        willDoNothing().given(userService).registerUser(any(UserDto.class));
+        // userService.modifyUser()가 호출될 때 createdDto를 updatedDto로 변경
+        willAnswer(invocation -> {
+            UserDto argument = invocation.getArgument(0);
+            BeanUtils.copyProperties(argument, createdDto); // updatedDto의 값을 createdDto로 복사
+            return null;
+        }).given(userService).modifyUser(any(UserDto.class));
+
+        String obj = new ObjectMapper().writeValueAsString(updatedDto);
 
         //When & Then
         mvc.perform(
-                        put("/kittop/user" + userId)
+                        put("/kittop/user/" + email)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(updatedObj)
+                                .content(obj)
                                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("정상적으로 회원 수정 되었습니다.")));
+
         then(userService).should().modifyUser(any(UserDto.class));
+
+        // createdDto가 updatedDto로 변경되었는지 검증
+        assertThat(createdDto).isEqualToComparingFieldByField(updatedDto);
     }
+
 
     @DisplayName("[API][DELETE] 회원 삭제 - 정상 호출, 인증된 사용자")
     @WithMockUser
@@ -99,7 +110,7 @@ class UserRestControllerTest {
 
         //When & Then
         mvc.perform(
-                        delete("/kittop/user" + userId)
+                        delete("/kittop/user/" + userId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(obj)
                                 .with(csrf()))
@@ -110,7 +121,7 @@ class UserRestControllerTest {
 
     private UserVo updatedUser() {
         return UserVo.builder()
-                .email("modify@gmail.com")
+                .email("test@gmail.com")
                 .password("1111")
                 .nickname("modify")
                 .name("modify")
@@ -127,7 +138,7 @@ class UserRestControllerTest {
 
     private UserDto updatedUserDto() {
         return UserDto.builder()
-                .email("modify@gmail.com")
+                .email("test@gmail.com")
                 .password("1111")
                 .nickname("modify")
                 .name("modify")
