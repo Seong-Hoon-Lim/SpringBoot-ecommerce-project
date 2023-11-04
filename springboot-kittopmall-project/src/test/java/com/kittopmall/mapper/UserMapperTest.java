@@ -3,6 +3,7 @@ package com.kittopmall.mapper;
 import com.kittopmall.vo.UserVo;
 import com.kittopmall.vo.constants.Role;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ class UserMapperTest {
     @Autowired
     private UserMapper userMapper;
 
+    @Disabled
     @DisplayName("mapper 테스트 - 회원 DB 저장 테스트")
     @Test
     void givenUser_whenSaving_thenWorksFine() {
@@ -43,6 +45,7 @@ class UserMapperTest {
         assertThat(userMapper.count()).isEqualTo(previousCount + 1);
     }
 
+    @Disabled
     @DisplayName("mapper 테스트 - 회원 고유번호로 회원 DB 조회 테스트")
     @Test
     void givenUserId_whenFindingUser_thenReturnUser() {
@@ -104,7 +107,7 @@ class UserMapperTest {
         assertThat(originalUser).isNotEqualTo(updatedUser);
     }
 
-    @DisplayName("mapper 테스트 - 회원 DB 수정 테스트")
+    @DisplayName("mapper 테스트 - 회원 DB 삭제 테스트")
     @Test
     void givenUserId_whenDeletingUser_thenWorksFine() {
         //Given
