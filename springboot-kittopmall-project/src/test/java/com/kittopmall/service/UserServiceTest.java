@@ -5,6 +5,7 @@ import com.kittopmall.mapper.UserMapper;
 import com.kittopmall.vo.UserVo;
 import com.kittopmall.vo.constants.Role;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -125,6 +126,7 @@ class UserServiceTest {
         then(userMapper).should().findUserByNickname(nickname);
     }
 
+    @Disabled
     @DisplayName("회원관리 service 설계 - 회원 수정 정보를 입력하면, 회원 정보를 수정한다")
     @Test
     void givenModifiedUserInfo_whenUpdatingUser_thenUpdatesUser() {

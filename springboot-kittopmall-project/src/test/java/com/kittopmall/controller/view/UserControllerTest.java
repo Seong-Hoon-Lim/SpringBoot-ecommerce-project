@@ -1,4 +1,4 @@
-package com.kittopmall.controller;
+package com.kittopmall.controller.view;
 
 import com.kittopmall.config.SecurityConfig;
 import com.kittopmall.controller.view.UserController;

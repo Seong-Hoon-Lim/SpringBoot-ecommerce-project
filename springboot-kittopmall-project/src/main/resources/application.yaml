@@ -25,4 +25,12 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
 
+jwt:
+  #인증 관련 표준 heaer 'Authorization' 적용
+  header: Authorization
+  #HS512 해싱 알고리즘 적용 - 64byte Base64 인코딩 (kittopmall secret key qndElrl qhRdmaqkq 20231104)
+  secret: a2l0dG9wbWFsbCBzZWNyZXQga2V5IHFuZEVscmwgcWhSZG1hcWtxIDIwMjMxMTA0
+  #86400초
+  token-validity-in-seconds: 86400
+
 
