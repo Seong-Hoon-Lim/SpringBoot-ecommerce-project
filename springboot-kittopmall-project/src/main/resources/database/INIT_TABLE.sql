@@ -1,6 +1,22 @@
-DROP TABLE kittopmall.user;
-SELECT *
-FROM kittopmall.user;
+
+
+CREATE TABLE user_master
+(
+    user_master_id            BIGINT AUTO_INCREMENT NOT NULL COMMENT '사용자 마스터 식별 키',
+    user_password             VARCHAR(255)          NOT NULL COMMENT '사용자 비밀번호',
+    user_type                 VARCHAR(50)           NOT NULL COMMENT '사용자 유형',
+    user_status               VARCHAR(50)           NOT NULL COMMENT '사용자 상태',
+    user_join_type            VARCHAR(50)           NOT NULL COMMENT '사용자 가입 유형',
+    user_role                 VARCHAR(50)           NOT NULL COMMENT '사용자 Role',
+    user_uuid                 VARCHAR(255)          NOT NULL COMMENT '사용자 uuid Key',
+    user_password_wrong_count INT                   NOT NULL COMMENT '사용자 패스워드 틀린 횟수',
+    user_authentication_id    BIGINT                NOT NULL COMMENT '사용자 인증번호 식별 키',
+    createdAt                 DATETIME              NOT NULL DEFAULT NOW(),
+    createdBy                 VARCHAR(100)          NOT NULL,
+    updateDate                DATETIME              NULL     DEFAULT NULL,
+    updatedBy                 VARCHAR(100)          NOT NULL
+);
+
 CREATE TABLE kittopmall.user
 (
     `userId`     BIGINT       NOT NULL AUTO_INCREMENT,
@@ -25,9 +41,6 @@ CREATE TABLE kittopmall.user
     UNIQUE INDEX `phone_UNIQUE` (`phone` ASC) VISIBLE
 );
 
-DROP TABLE kittopmall.item;
-SELECT *
-FROM kittopmall.item;
 CREATE TABLE kittopmall.item
 (
     `itemId`     BIGINT       NOT NULL AUTO_INCREMENT,
@@ -45,9 +58,6 @@ CREATE TABLE kittopmall.item
     PRIMARY KEY (`itemId`)
 );
 
-DROP TABLE kittopmall.cart;
-SELECT *
-FROM kittopmall.cart;
 CREATE TABLE kittopmall.cart
 (
     `cartId`    BIGINT       NOT NULL AUTO_INCREMENT,
@@ -69,9 +79,6 @@ CREATE TABLE kittopmall.cart
     UNIQUE INDEX `itemId_UNIQUE` (`itemId` ASC) VISIBLE
 );
 
-DROP TABLE kittopmall.orders;
-SELECT *
-FROM kittopmall.orders;
 CREATE TABLE kittopmall.orders
 (
     `orderId`         BIGINT       NOT NULL AUTO_INCREMENT,
@@ -97,9 +104,6 @@ CREATE TABLE kittopmall.orders
     PRIMARY KEY (`orderId`)
 );
 
-DROP TABLE kittopmall.question;
-SELECT *
-FROM kittopmall.question;
 CREATE TABLE kittopmall.question
 (
     `questionId` BIGINT       NOT NULL AUTO_INCREMENT,
@@ -115,9 +119,6 @@ CREATE TABLE kittopmall.question
     PRIMARY KEY (`questionId`)
 );
 
-DROP TABLE kittopmall.review;
-SELECT *
-FROM kittopmall.review;
 create table kittopmall.review
 (
     `reviewId`   bigint auto_increment
@@ -140,9 +141,6 @@ create table kittopmall.review
 create index review_itemId_FK_idx
     on kittopmall.review (itemId);
 
-DROP TABLE kittopmall.comment;
-SELECT *
-FROM kittopmall.comment;
 CREATE TABLE kittopmall.comment
 (
     commentId    BIGINT       NOT NULL AUTO_INCREMENT,
