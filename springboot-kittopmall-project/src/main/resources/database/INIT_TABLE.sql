@@ -1,47 +1,56 @@
-
-
 CREATE TABLE user_master
 (
     user_master_id            BIGINT AUTO_INCREMENT NOT NULL COMMENT '사용자 마스터 식별 키',
     user_password             VARCHAR(255)          NOT NULL COMMENT '사용자 비밀번호',
     user_type                 VARCHAR(50)           NOT NULL COMMENT '사용자 유형',
     user_status               VARCHAR(50)           NOT NULL COMMENT '사용자 상태',
-    user_join_type            VARCHAR(50)           NOT NULL COMMENT '사용자 가입 유형',
+    user_join_type            VARCHAR(50)           NOT NULL COMMENT '사용자 가입 유형(EMAIL/SNS)',
     user_role                 VARCHAR(50)           NOT NULL COMMENT '사용자 Role',
-    user_uuid                 VARCHAR(255)          NOT NULL COMMENT '사용자 uuid Key',
+    oauth2_type               VARCHAR(100)          NULL     DEFAULT NULL  COMMENT 'SNS 유형',
+    oauth2_id                 VARCHAR(100)          NULL     DEFAULT NULL  COMMENT 'SNS 계정 식별키',
+    user_uuid                 VARCHAR(255)          NULL     DEFAULT NULL  COMMENT '사용자 uuid Key',
     user_password_wrong_count INT                   NOT NULL COMMENT '사용자 패스워드 틀린 횟수',
     user_authentication_id    BIGINT                NOT NULL COMMENT '사용자 인증번호 식별 키',
-    createdAt                 DATETIME              NOT NULL DEFAULT NOW(),
-    createdBy                 VARCHAR(100)          NOT NULL,
-    updateDate                DATETIME              NULL     DEFAULT NULL,
-    updatedBy                 VARCHAR(100)          NOT NULL
-);
+    join_datetime             DATETIME              NOT NULL DEFAULT NOW() COMMENT '가입 일자',
+    withdrawal_datetime       DATETIME              NULL     DEFAULT NULL  COMMENT '탈퇴 일자',
+    created_datetime          DATETIME              NOT NULL DEFAULT NOW(),
+    created_by                VARCHAR(100)          NOT NULL,
+    updated_datetime          DATETIME              NULL     DEFAULT NULL,
+    updated_by                VARCHAR(100)          NOT NULL,
+    PRIMARY KEY (user_master_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='사용자 마스터 테이블'
+;
 
-CREATE TABLE kittopmall.user
+CREATE TABLE user_master_detail
 (
-    `userId`     BIGINT       NOT NULL AUTO_INCREMENT,
-    `email`      VARCHAR(100) NOT NULL,
-    `password`   VARCHAR(255) NOT NULL,
-    `nickname`   VARCHAR(100) NOT NULL,
-    `name`       VARCHAR(100) NOT NULL,
-    `birth`      VARCHAR(100) NOT NULL,
-    `gender`     VARCHAR(10)  NOT NULL,
-    `addr`       VARCHAR(100) NOT NULL,
-    `phone`      VARCHAR(100) NOT NULL,
-    `provider`   VARCHAR(100) NULL,
-    `providerId` VARCHAR(100) NULL,
-    `createdAt`  DATETIME     NOT NULL DEFAULT now(),
-    `createdBy`  VARCHAR(100) NOT NULL,
-    `updateDate` DATETIME     NULL     DEFAULT NULL,
-    `updatedBy`  VARCHAR(100) NULL,
-    `role`       VARCHAR(50)  NOT NULL,
-    PRIMARY KEY (`userId`),
-    UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
-    UNIQUE INDEX `nickname_UNIQUE` (`nickname` ASC) VISIBLE,
-    UNIQUE INDEX `phone_UNIQUE` (`phone` ASC) VISIBLE
-);
+    user_master_detail_id     BIGINT AUTO_INCREMENT NOT NULL COMMENT '사용자 마스터 상세 식별 키',
+    user_master_id            BIGINT                NOT NULL COMMENT '사용자 마스터 식별 키',
+    user_account              VARCHAR(100)          NOT NULL COMMENT '사용자 계정',
+    nickname                  VARCHAR(100)          NOT NULL COMMENT '닉네임',
+    email                     VARCHAR(100)          NOT NULL COMMENT '이메일',
+    name                      VARCHAR(100)          NOT NULL COMMENT '이름',
+    birth                     VARCHAR(8)            NOT NULL COMMENT '생년월일',
+    mobile                    VARCHAR(14)           NOT NULL COMMENT '휴대폰번호',
+    telephone                 VARCHAR(14)           NOT NULL COMMENT '유선번호',
+    gender                    char(1)               NOT NULL COMMENT '성별(M/W)',
+    postal_code               VARCHAR(100)          NOT NULL COMMENT '우편번호',
+    state                     VARCHAR(100)          NOT NULL COMMENT '도',
+    city                      VARCHAR(100)          NOT NULL COMMENT '시',
+    district                  VARCHAR(100)          NOT NULL COMMENT '구(군)',
+    sub_district              VARCHAR(100)          NOT NULL COMMENT '동',
+    address_detail            VARCHAR(100)          NOT NULL COMMENT '상세주소',
+    created_datetime          DATETIME              NOT NULL DEFAULT NOW(),
+    created_by                VARCHAR(100)          NOT NULL,
+    updated_datetime          DATETIME              NULL     DEFAULT NULL,
+    updated_by                VARCHAR(100)          NOT NULL,
+    PRIMARY KEY (user_master_detail_id),
+    UNIQUE INDEX `nickname_UNIQUE`  (`nickname` ASC)    VISIBLE,
+    UNIQUE INDEX `email_UNIQUE`     (`email` ASC)       VISIBLE,
+    UNIQUE INDEX `mobile_UNIQUE`    (`mobile` ASC)      VISIBLE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='사용자 마스터 상세 테이블'
+;
 
-CREATE TABLE kittopmall.item
+CREATE TABLE item_master
 (
     `itemId`     BIGINT       NOT NULL AUTO_INCREMENT,
     `category`   VARCHAR(50)  NOT NULL,
