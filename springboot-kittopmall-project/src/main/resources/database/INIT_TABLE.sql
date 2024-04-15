@@ -50,11 +50,29 @@ CREATE TABLE user_master_detail
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='사용자 마스터 상세 테이블'
 ;
 
-CREATE TABLE item_master
+CREATE TABLE product_master
 (
-    `itemId`     BIGINT       NOT NULL AUTO_INCREMENT,
-    `category`   VARCHAR(50)  NOT NULL,
-    `itemName`   VARCHAR(100) NOT NULL,
+    product_master_id         BIGINT AUTO_INCREMENT NOT NULL COMMENT '상품 마스터 식별 키',
+    user_master_id            BIGINT                NOT NULL COMMENT '사용자 마스터 식별 키',
+    product_type              VARCHAR(50)           NOT NULL COMMENT '상품 유형',
+    product_status            VARCHAR(50)           NOT NULL COMMENT '상품 상태',
+    product_image_id          BIGINT                NOT NULL COMMENT '상품 이미지 식별 키',
+    created_datetime          DATETIME              NOT NULL DEFAULT NOW() COMMENT '상품 생성 일자',
+    created_by                VARCHAR(100)          NOT NULL,
+    uploaded_datetime           DATETIME              NOT NULL DEFAULT NOW() COMMENT '상품 업로드 일자',
+    uploaded_by                VARCHAR(100)          NOT NULL,
+    updated_datetime          DATETIME              NULL     DEFAULT NULL,
+    updated_by                VARCHAR(100)          NOT NULL,
+    removed_datetime           DATETIME              NULL     DEFAULT NULL  COMMENT '상품 삭제 일자',
+    removed_by                VARCHAR(100)          NOT NULL,
+    PRIMARY KEY (product_master_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='상품 마스터 테이블'
+;
+
+CREATE TABLE product_master_detail
+(
+    product_master_detail_id  BIGINT AUTO_INCREMENT NOT NULL COMMENT '상품 마스터 상세 식별 키',
+    product_master_id         BIGINT                NOT NULL COMMENT '상품 마스터 식별 키',
     `price`      INT          NOT NULL,
     `stock`      INT          NOT NULL DEFAULT 0,
     `hit`        INT          NOT NULL DEFAULT 0,
@@ -64,7 +82,7 @@ CREATE TABLE item_master
     `createdBy`  VARCHAR(100) NOT NULL,
     `updateDate` DATETIME     NULL     DEFAULT NULL,
     `updatedBy`  VARCHAR(100) NOT NULL,
-    PRIMARY KEY (`itemId`)
+    PRIMARY KEY (item_master_id)
 );
 
 CREATE TABLE kittopmall.cart
