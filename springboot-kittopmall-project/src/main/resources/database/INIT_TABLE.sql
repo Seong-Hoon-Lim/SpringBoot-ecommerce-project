@@ -44,6 +44,9 @@ CREATE TABLE user_master_detail
     updated_datetime          DATETIME              NULL     DEFAULT NULL,
     updated_by                VARCHAR(100)          NOT NULL,
     PRIMARY KEY (user_master_detail_id),
+    FOREIGN KEY (user_master_id) REFERENCES user_master (user_master_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
     UNIQUE INDEX `nickname_UNIQUE`  (`nickname` ASC)    VISIBLE,
     UNIQUE INDEX `email_UNIQUE`     (`email` ASC)       VISIBLE,
     UNIQUE INDEX `mobile_UNIQUE`    (`mobile` ASC)      VISIBLE
@@ -54,18 +57,23 @@ CREATE TABLE product_master
 (
     product_master_id         BIGINT AUTO_INCREMENT NOT NULL COMMENT '상품 마스터 식별 키',
     user_master_id            BIGINT                NOT NULL COMMENT '사용자 마스터 식별 키',
+    product_image_id          BIGINT                NOT NULL COMMENT '상품 이미지 식별 키',
     product_type              VARCHAR(50)           NOT NULL COMMENT '상품 유형',
     product_status            VARCHAR(50)           NOT NULL COMMENT '상품 상태',
-    product_image_id          BIGINT                NOT NULL COMMENT '상품 이미지 식별 키',
-    created_datetime          DATETIME              NOT NULL DEFAULT NOW() COMMENT '상품 생성 일자',
-    created_by                VARCHAR(100)          NOT NULL,
-    uploaded_datetime           DATETIME              NOT NULL DEFAULT NOW() COMMENT '상품 업로드 일자',
-    uploaded_by                VARCHAR(100)          NOT NULL,
-    updated_datetime          DATETIME              NULL     DEFAULT NULL,
-    updated_by                VARCHAR(100)          NOT NULL,
-    removed_datetime           DATETIME              NULL     DEFAULT NULL  COMMENT '상품 삭제 일자',
-    removed_by                VARCHAR(100)          NOT NULL,
-    PRIMARY KEY (product_master_id)
+    wishlist_status           VARCHAR(50)           NULL     DEFAULT NULL  COMMENT '상품 찜하기 상태',
+    like_count                INT                   NOT NULL DEFAULT 0     COMMENT '상품 좋아요 수',
+    created_datetime          DATETIME              NOT NULL DEFAULT NOW() COMMENT '상품 생성된 일자',
+    created_by                VARCHAR(100)          NOT NULL COMMENT '상품 생성자',
+    uploaded_datetime         DATETIME              NOT NULL DEFAULT NOW() COMMENT '상품 업로드된 일자',
+    uploaded_by               VARCHAR(100)          NOT NULL COMMENT '상품 업로더',
+    updated_datetime          DATETIME              NULL     DEFAULT NULL  COMMENT '상품 수정된 일자',
+    updated_by                VARCHAR(100)          NOT NULL COMMENT '상품 수정자',
+    removed_datetime          DATETIME              NULL     DEFAULT NULL  COMMENT '상품 삭제된 일자',
+    removed_by                VARCHAR(100)          NOT NULL COMMENT '상품 삭제자',
+    PRIMARY KEY (product_master_id),
+    FOREIGN KEY (user_master_id) REFERENCES user_master (user_master_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='상품 마스터 테이블'
 ;
 
@@ -73,17 +81,48 @@ CREATE TABLE product_master_detail
 (
     product_master_detail_id  BIGINT AUTO_INCREMENT NOT NULL COMMENT '상품 마스터 상세 식별 키',
     product_master_id         BIGINT                NOT NULL COMMENT '상품 마스터 식별 키',
-    `price`      INT          NOT NULL,
-    `stock`      INT          NOT NULL DEFAULT 0,
-    `hit`        INT          NOT NULL DEFAULT 0,
-    `content`    TEXT         NOT NULL,
-    `imgName`    VARCHAR(255) NOT NULL,
-    `createdAt`  DATETIME     NOT NULL DEFAULT now(),
-    `createdBy`  VARCHAR(100) NOT NULL,
-    `updateDate` DATETIME     NULL     DEFAULT NULL,
-    `updatedBy`  VARCHAR(100) NOT NULL,
-    PRIMARY KEY (item_master_id)
+    product_number            VARCHAR(100)          NOT NULL COMMENT '상품 번호',
+    product_name              VARCHAR(100)          NOT NULL COMMENT '상품명',
+    price                     INT                   NOT NULL COMMENT '상품 가격',
+    stock                     INT                   NOT NULL DEFAULT 0     COMMENT '상품 재고',
+    hit                       INT                   NOT NULL DEFAULT 0     COMMENT '상품 조회 수',
+    product_material          VARCHAR(100)          NOT NULL COMMENT '상품 소재',
+    product_color             VARCHAR(50)           NOT NULL COMMENT '상품 색상',
+    product_size              VARCHAR(50)           NOT NULL COMMENT '상품 사이즈',
+    product_manufacturer      VARCHAR(100)          NOT NULL COMMENT '제조사',
+    care_instructions         TEXT                  NOT NULL COMMENT '제품 관련 주의사항',
+    customer_center           VARCHAR(14)           NOT NULL COMMENT '고객센터 번호',
+    created_datetime          DATETIME              NOT NULL DEFAULT NOW(),
+    created_by                VARCHAR(100)          NOT NULL,
+    updated_datetime          DATETIME              NULL     DEFAULT NULL,
+    updated_by                VARCHAR(100)          NOT NULL,
+    PRIMARY KEY (product_master_detail_id),
+    FOREIGN KEY (product_master_id) REFERENCES product_master (product_master_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+    UNIQUE INDEX product_number_idx (product_number ASC) VISIBLE,
+    UNIQUE INDEX product_name_idx   (product_name ASC) VISIBLE
 );
+
+CREATE TABLE product_wishlist
+(
+    user_master_id      BIGINT NOT NULL,
+    product_master_id   BIGINT NOT NULL,
+    added_at            DATETIME DEFAULT NOW(),
+    PRIMARY KEY (user_master_id, product_master_id),
+    FOREIGN KEY (user_master_id) REFERENCES user_master (user_master_id),
+    FOREIGN KEY (product_master_id) REFERENCES product_master (product_master_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='사용자 찜 목록';
+
+CREATE TABLE product_likes
+(
+    user_master_id      BIGINT NOT NULL,
+    product_master_id   BIGINT NOT NULL,
+    liked_at            DATETIME DEFAULT NOW(),
+    PRIMARY KEY (user_master_id, product_master_id),
+    FOREIGN KEY (user_master_id) REFERENCES user_master (user_master_id),
+    FOREIGN KEY (product_master_id) REFERENCES product_master (product_master_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='상품 좋아요 목록';
 
 CREATE TABLE kittopmall.cart
 (
